@@ -5,10 +5,10 @@ export type UserEntity = {
   username: string;
   email: string;
   password?: string;
-  avatar_url?: File;
+  avatar_url?: string;
   status?: 'online' | 'offline';
-  created_at?: Date;
-  last_online?: Date;
+  created_at?: string;
+  last_online?: string;
 };
 
 export type SessionEntity = {

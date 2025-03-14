@@ -60,7 +60,8 @@ function NavLink({
   return (
     <Link
       href={route}
-      className="flex items-center bg-auxiliary px-2 py-1 rounded-lg hover:bg-darker gap-2 transition-colors"
+      className="flex items-center bg-auxiliary px-2 py-1 rounded-lg
+      hover:bg-darker gap-2 transition-colors active:scale-95"
     >
       {icon}
       <span className="hidden sm:inline">{text}</span>

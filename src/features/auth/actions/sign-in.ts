@@ -2,8 +2,8 @@
 import { sessionService } from '@/entities/user/server';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { verifyUser } from '@/entities/user/services/verify-user';
 import { routes } from '@/kernel/routes';
+import { verifyUser } from '@/entities/user/server';
 
 export type SignInFormState = {
   formData?: FormData;

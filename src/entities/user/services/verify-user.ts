@@ -1,8 +1,8 @@
 import { userRepository } from '../repositories/user';
 
 export async function verifyUser(email: string, password: string) {
-  
-  const { user, errorMessage } = await userRepository.getUser(email, password);
+
+  const { user, errorMessage } = await userRepository.loginUser(email, password);
 
   if (errorMessage) {
     return { userId: undefined, errorMessage };

@@ -5,7 +5,7 @@ import React from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-darker">
+    <main className="min-h-screen bg-main">
       <Header />
       {children}
     </main>
