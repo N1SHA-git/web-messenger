@@ -1,19 +1,17 @@
-'use client';
-import Link from 'next/link';
-import { LogOut, MessageSquare, Settings, User } from 'lucide-react';
-import { routes } from '@/kernel/routes';
-import { logoutAction } from '@/features/auth/actions/logout';
+"use client";
+import Link from "next/link";
+import { LogOut, MessageSquare, Settings, User } from "lucide-react";
+import { routes } from "@/kernel/routes";
+import { logoutAction } from "@/features/auth/actions/logout";
 
 export function Header() {
   return (
-    <header className="border-b w-full backdrop-blur-lg bg-main">
+    <header className="border-b border-base-300 w-full backdrop-blur-lg bg-base-100/80">
       <div className="container mx-auto px-4 h-16">
         <div className="flex items-center justify-between h-full">
-
           <Logo />
 
           <nav className="flex items-center gap-3">
-
             <NavLink
               route={routes.settings()}
               text="Settings"
@@ -58,11 +56,7 @@ function NavLink({
   icon: React.ReactNode;
 }) {
   return (
-    <Link
-      href={route}
-      className="flex items-center bg-auxiliary px-2 py-1 rounded-lg
-      hover:bg-darker gap-2 transition-colors active:scale-95"
-    >
+    <Link href={route} className="btn btn-sm gap-2 transition-colors">
       {icon}
       <span className="hidden sm:inline">{text}</span>
     </Link>

@@ -1,4 +1,4 @@
-import { UserId } from '@/kernel/ids';
+import { UserId } from "@/kernel/ids";
 
 export type UserEntity = {
   id: UserId;
@@ -6,7 +6,7 @@ export type UserEntity = {
   email: string;
   password?: string;
   avatar_url?: string;
-  status?: 'online' | 'offline';
+  status?: "online" | "offline";
   created_at?: string;
   last_online?: string;
 };

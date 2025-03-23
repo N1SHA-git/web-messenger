@@ -1,4 +1,3 @@
-import { Button } from "@/shared/ui/button";
 import React from "react";
 
 export function SubmitButton({
@@ -9,8 +8,12 @@ export function SubmitButton({
   isPending?: boolean;
 }) {
   return (
-    <Button disabled={isPending} type="submit" className="w-full">
+    <button
+      disabled={isPending}
+      type="submit"
+      className="btn btn-primary w-full !mt-10"
+    >
       {children}
-    </Button>
+    </button>
   );
 }

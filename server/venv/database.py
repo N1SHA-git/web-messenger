@@ -4,7 +4,6 @@ from models import Base
 from config import settings
 
 # Задаем строку подключения для асинхронного драйвера asyncpg.
-# Обратите внимание на префикс "postgresql+asyncpg://"
 DATABASE_URL = settings.DATABASE_URL_asyncpg
 
 # Создаем асинхронный движок
@@ -12,8 +11,8 @@ engine = create_async_engine(DATABASE_URL, echo=True)
 
 # Фабрика асинхронных сессий
 AsyncSessionLocal = sessionmaker(
-    bind=engine, 
-    class_=AsyncSession, 
+    bind=engine,
+    class_=AsyncSession,
     expire_on_commit=False
 )
 

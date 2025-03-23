@@ -1,8 +1,8 @@
-'use server';
-import { createUser, sessionService } from '@/entities/user/server';
-import { routes } from '@/kernel/routes';
-import { redirect } from 'next/navigation';
-import { z } from 'zod';
+"use server";
+import { createUser, sessionService } from "@/entities/user/server";
+import { routes } from "@/kernel/routes";
+import { redirect } from "next/navigation";
+import { z } from "zod";
 
 export type SignUpFormState = {
   formData?: FormData;
@@ -16,23 +16,23 @@ export type SignUpFormState = {
 const formDataSchema = z.object({
   username: z
     .string()
-    .min(3, { message: 'username must be at least 3 characters' })
+    .min(3, { message: "username must be at least 3 characters" })
     .trim(),
-  email: z.string().email({ message: 'invalid email address' }).trim(),
+  email: z.string().email({ message: "invalid email address" }).trim(),
   password: z
     .string()
-    .min(6, { message: 'password must be at least 6 characters' })
-    .regex(/[a-zA-Z]/, { message: 'contain at least one letter.' })
-    .regex(/[0-9]/, { message: 'contain at least one number.' })
+    .min(6, { message: "password must be at least 6 characters" })
+    .regex(/[a-zA-Z]/, { message: "contain at least one letter." })
+    .regex(/[0-9]/, { message: "contain at least one number." })
     .trim(),
 });
 
 export async function signUpAction(
   prevState: SignUpFormState,
-  formData: FormData
+  formData: FormData,
 ) {
   const result = formDataSchema.safeParse(
-    Object.fromEntries(formData.entries())
+    Object.fromEntries(formData.entries()),
   );
 
   if (!result.success) {
@@ -40,9 +40,9 @@ export async function signUpAction(
     return {
       formData,
       errors: {
-        username: formatedErrors.username?._errors.join(', '),
-        email: formatedErrors.email?._errors.join(', '),
-        password: formatedErrors.password?._errors.join(', '),
+        username: formatedErrors.username?._errors.join(", "),
+        email: formatedErrors.email?._errors.join(", "),
+        password: formatedErrors.password?._errors.join(", "),
       },
     };
   }

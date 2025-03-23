@@ -1,19 +1,17 @@
-'use client';
-import { ChangeEvent, useState } from 'react';
-import Image from 'next/image';
-import { Camera } from 'lucide-react';
-import { userRepository } from '@/entities/user/repositories/user';
-import { Skeleton } from '@/shared/ui/skeleton';
+"use client";
+import { ChangeEvent, useState } from "react";
+import Image from "next/image";
+import { Camera } from "lucide-react";
+import { updateProfile } from "@/store/slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
 
-type AvatarProps = {
-  userAvatar: string | undefined;
-  isLoading: boolean;
-  userId: number;
-};
-
-export function Avatar({ userAvatar, isLoading, userId }: AvatarProps) {
+export function Avatar() {
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
-
+  const { user, isUpdatingProfile } = useSelector(
+    (state: RootState) => state.user,
+  );
+  const dispatch = useDispatch<AppDispatch>();
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -24,18 +22,22 @@ export function Avatar({ userAvatar, isLoading, userId }: AvatarProps) {
     reader.onload = async () => {
       const base64Image = reader.result as string;
       setSelectedImg(base64Image);
-      await userRepository.updateAvatar(userId, base64Image);
+      if (user?.id) {
+        await dispatch(updateProfile({ userId: user.id, base64Image }));
+      } else {
+        console.error("User ID is undefined");
+      }
     };
   };
 
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative">
-        {isLoading ? (
-          <Skeleton className="size-32 rounded-full border-4 border-white/80" />
+        {isUpdatingProfile ? (
+          <div className="skeleton size-32 rounded-full object-cover border-4 border-white/80"></div>
         ) : (
           <Image
-            src={selectedImg || userAvatar || '/avatar.png'}
+            src={selectedImg || user?.avatar_url || "/avatar.png"}
             alt="Profile"
             className="size-32 rounded-full object-cover border-4 border-white/80"
             width={128}
@@ -46,27 +48,29 @@ export function Avatar({ userAvatar, isLoading, userId }: AvatarProps) {
           htmlFor="avatar-upload"
           className={`
                   absolute bottom-0 right-0
-                  bg-zinc-300 hover:scale-105
+                  bg-base-content hover:scale-105
                   p-2 rounded-full cursor-pointer
                   transition-all duration-200
-                  ${isLoading ? 'animate-pulse pointer-events-none' : ''}
+                  ${
+                    isUpdatingProfile ? "animate-pulse pointer-events-none" : ""
+                  }
                 `}
         >
-          <Camera className="w-5 h-5 text-darker" />
+          <Camera className="w-5 h-5 text-base-200" />
           <input
             type="file"
             id="avatar-upload"
             className="hidden"
             accept="image/*"
             onChange={handleImageUpload}
-            disabled={isLoading}
+            disabled={isUpdatingProfile}
           />
         </label>
       </div>
       <p className="text-sm text-zinc-400">
-        {isLoading
-          ? 'Uploading...'
-          : 'Click the camera icon to update your photo'}
+        {isUpdatingProfile
+          ? "Uploading..."
+          : "Click the camera icon to update your photo"}
       </p>
     </div>
   );

@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict # type: ignore
 
 class Settings(BaseSettings):
   DB_HOST: str
@@ -7,6 +7,7 @@ class Settings(BaseSettings):
   DB_PASSWORD: str
   DB_NAME: str
   SECRET_KEY: str
+  DATABASE_URL: str
 
   @property
   def DATABASE_URL_asyncpg(self):

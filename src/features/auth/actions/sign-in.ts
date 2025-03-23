@@ -1,9 +1,9 @@
-'use server';
-import { sessionService } from '@/entities/user/server';
-import { redirect } from 'next/navigation';
-import { z } from 'zod';
-import { routes } from '@/kernel/routes';
-import { verifyUser } from '@/entities/user/server';
+"use server";
+import { sessionService } from "@/entities/user/server";
+import { redirect } from "next/navigation";
+import { z } from "zod";
+import { routes } from "@/kernel/routes";
+import { verifyUser } from "@/entities/user/server";
 
 export type SignInFormState = {
   formData?: FormData;
@@ -14,21 +14,21 @@ export type SignInFormState = {
 };
 
 const formDataSchema = z.object({
-  email: z.string().email({ message: 'invalid email address' }).trim(),
+  email: z.string().email({ message: "invalid email address" }).trim(),
   password: z
     .string()
-    .min(6, { message: 'password must be at least 6 characters' })
-    .regex(/[a-zA-Z]/, { message: 'contain at least one letter.' })
-    .regex(/[0-9]/, { message: 'contain at least one number.' })
+    .min(6, { message: "password must be at least 6 characters" })
+    .regex(/[a-zA-Z]/, { message: "contain at least one letter." })
+    .regex(/[0-9]/, { message: "contain at least one number." })
     .trim(),
 });
 
 export async function signInAction(
   prevState: SignInFormState,
-  formData: FormData
+  formData: FormData,
 ): Promise<SignInFormState> {
   const result = formDataSchema.safeParse(
-    Object.fromEntries(formData.entries())
+    Object.fromEntries(formData.entries()),
   );
 
   if (!result.success) {
@@ -36,8 +36,8 @@ export async function signInAction(
     return {
       formData,
       errors: {
-        email: formatedErrors.email?._errors.join(', '),
-        password: formatedErrors.password?._errors.join(', '),
+        email: formatedErrors.email?._errors.join(", "),
+        password: formatedErrors.password?._errors.join(", "),
       },
     };
   }
@@ -50,7 +50,7 @@ export async function signInAction(
     return {
       formData,
       errors: {
-        email: errorMessage ? errorMessage.toString() : 'Failed to verify user',
+        email: errorMessage ? errorMessage.toString() : "Failed to verify user",
       },
     };
   }

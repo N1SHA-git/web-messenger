@@ -1,21 +1,21 @@
-import axios from 'axios';
-import { UserEntity } from '../domain';
-import { UserId } from '@/kernel/ids';
-import { toast } from 'react-toastify';
+import axios from "axios";
+import { UserEntity } from "../domain";
+import { UserId } from "@/kernel/ids";
+import { toast } from "react-toastify";
 
 async function saveUser(
   username: string,
   email: string,
-  password: string
+  password: string,
 ): Promise<{ user?: UserEntity; errorMessage?: string }> {
-  const user: Omit<UserEntity, 'id'> = {
+  const user: Omit<UserEntity, "id"> = {
     username, // id будет присвоен на сервере
     email,
     password, // Пароль будет хэшироваться на сервере
   };
 
   try {
-    const response = await axios.post('http://localhost:8000/save_user', user);
+    const response = await axios.post("http://localhost:8000/auth/save_user", user);
     if (response.status === 200) {
       const savedUser = response.data as UserEntity;
       return { user: savedUser };
@@ -24,22 +24,22 @@ async function saveUser(
     if (axios.isAxiosError(error) && error.response) {
       // Обработка HTTPException из main.py
       const errorMessage = error.response.data.detail;
-      return {errorMessage};
+      return { errorMessage };
     } else {
-      console.error('Error creating user:', error);
+      console.error("Error creating user:", error);
       throw error;
     }
   }
 
-  return { errorMessage: 'Unexpected error occurred in saveUser' };
+  return { errorMessage: "Unexpected error occurred in saveUser" };
 }
 
 async function loginUser(
   email: string,
-  password: string
+  password: string,
 ): Promise<{ user?: UserEntity; errorMessage?: string }> {
   try {
-    const response = await axios.post('http://localhost:8000/login', {
+    const response = await axios.post("http://localhost:8000/auth/login", {
       email,
       password,
     });
@@ -53,18 +53,18 @@ async function loginUser(
       const errorMessage = error.response.data.detail;
       return { errorMessage };
     } else {
-      console.error('Error during sign-in:', error);
+      console.error("Error during sign-in:", error);
       throw error;
     }
   }
-  return { errorMessage: 'Unexpected error occurred in getUser' };
+  return { errorMessage: "Unexpected error occurred in getUser" };
 }
 
 async function getUser(
-  id: UserId
+  id: UserId,
 ): Promise<{ user?: UserEntity; errorMessage?: string }> {
   try {
-    const response = await axios.get(`http://localhost:8000/users/${id}`);
+    const response = await axios.get(`http://localhost:8000/auth/check/${id}`);
 
     if (response.status === 200) {
       const user = response.data as UserEntity;
@@ -75,28 +75,29 @@ async function getUser(
       const errorMessage = error.response.data.detail;
       return { errorMessage };
     } else {
-      console.error('Error during getUser:', error);
+      console.error("Error during getUser:", error);
       throw error;
     }
   }
-  return { errorMessage: 'Unexpected error occurred in getUser' };
+  return { errorMessage: "Unexpected error occurred in getUser" };
 }
 
-
-const updateAvatar = async (userId: UserId, base64Image:string) => {
+const updateAvatar = async (userId: UserId, base64Image: string) => {
   try {
-    const response = await axios.put(`http://localhost:8000/update_avatar/${userId}`, {
-      profilePic: base64Image
-    });
-    console.log('Avatar updated successfully:', response.data);
-    toast.success('Avatar updated successfully')
+    const response = await axios.put(
+      `http://localhost:8000/auth/update_avatar/${userId}`,
+      {
+        profilePic: base64Image,
+      },
+    );
+    console.log("Avatar updated successfully:", response.data);
+    toast.success("Avatar updated successfully");
     return response.data;
   } catch (error) {
-    console.error('Error updating avatar:', error);
-    toast.error('Error in update profile')
+    console.error("Error updating avatar:", error);
+    toast.error("Error in update profile");
     throw error;
   }
 };
-
 
 export const userRepository = { saveUser, loginUser, getUser, updateAvatar };

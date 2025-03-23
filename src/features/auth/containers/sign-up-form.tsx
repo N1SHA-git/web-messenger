@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { AuthFormLayout } from '../ui/auth-form-layout';
-import { AuthFields } from '../ui/fields';
-import { SubmitButton } from '../ui/submit-button';
-import { BottomLink } from '../ui/link';
-import { SignUpFormState, signUpAction } from '../actions/sign-up';
-import { routes } from '@/kernel/routes';
-import { useActionState } from 'react';
+import { AuthFormLayout } from "../ui/auth-form-layout";
+import { AuthFields } from "../ui/fields";
+import { SubmitButton } from "../ui/submit-button";
+import { BottomLink } from "../ui/link";
+import { SignUpFormState, signUpAction } from "../actions/sign-up";
+import { routes } from "@/kernel/routes";
+import { useActionState } from "react";
 
 export function SignUpForm() {
   const [formState, action, isPending] = useActionState(
     signUpAction,
-    {} as SignUpFormState
+    {} as SignUpFormState,
   );
 
   return (

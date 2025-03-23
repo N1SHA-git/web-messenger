@@ -11,9 +11,12 @@ export function BottomLink({
   url: string;
 }) {
   return (
-    <p className="text-sm text-primary/50">
+    <p className="text-sm">
       {text}{" "}
-      <Link href={url} className="font-medium text-primary hover:underline">
+      <Link
+        href={url}
+        className="link link-primary no-underline hover:underline font-medium"
+      >
         {linkText}
       </Link>
     </p>
