@@ -9,9 +9,9 @@ async function saveUser(
   password: string,
 ): Promise<{ user?: UserEntity; errorMessage?: string }> {
   const user: Omit<UserEntity, "id"> = {
-    username, // id будет присвоен на сервере
+    username, // id gonna be added on server
     email,
-    password, // Пароль будет хэшироваться на сервере
+    password, // password gonna be crypt on server
   };
 
   try {
@@ -22,7 +22,7 @@ async function saveUser(
     }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      // Обработка HTTPException из main.py
+      // processing HTTPException from main.py
       const errorMessage = error.response.data.detail;
       return { errorMessage };
     } else {

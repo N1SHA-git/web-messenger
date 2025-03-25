@@ -24,8 +24,6 @@ class AvatarUpdate(BaseModel):
     profilePic: str
 
 class MessageCreate(BaseModel):
-    sender_id: int
-    receiver_id: int
     text: Optional[str] = None
     image: Optional[str] = None
 

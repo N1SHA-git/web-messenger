@@ -1,3 +1,3 @@
-export { Header } from "./header/containers/header";
-export { SidebarSkeleton } from "./skeletons/sidebar-skeleton";
-export { MessageSkeleton } from "./skeletons/message-skeleton";
+export { Header } from "./header/container/header";
+export { SidebarSkeleton } from "../entities/chat/ui/sidebar-skeleton";
+export { MessageSkeleton } from "../entities/chat/ui/message-skeleton";

@@ -8,9 +8,7 @@ import { AppDispatch, RootState } from "@/store/store";
 
 export function Avatar() {
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
-  const { user, isUpdatingProfile } = useSelector(
-    (state: RootState) => state.user,
-  );
+  const { user, isUpdatingProfile } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -22,11 +20,7 @@ export function Avatar() {
     reader.onload = async () => {
       const base64Image = reader.result as string;
       setSelectedImg(base64Image);
-      if (user?.id) {
-        await dispatch(updateProfile({ userId: user.id, base64Image }));
-      } else {
-        console.error("User ID is undefined");
-      }
+      await dispatch(updateProfile(base64Image));
     };
   };
 
