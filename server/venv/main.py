@@ -15,9 +15,6 @@ import cloudinary.uploader
 
 
 
-sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins="*")
-app = FastAPI()
-socket_app = socketio.ASGIApp(sio, app)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,7 +22,9 @@ async def lifespan(app: FastAPI):
     print("Таблицы созданы успешно!")
     yield
 
+
 app = FastAPI(lifespan=lifespan)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,6 +33,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins="*")
+socket_app = socketio.ASGIApp(sio, app)
+
+app.mount("/socket.io", socket_app)
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
@@ -45,9 +49,12 @@ def get_receiver_socket_id(user_id: int) -> str:
     return user_socket_map.get(user_id)
 
 @sio.event
-async def connect(sid, environ, auth):
+async def connect(sid, environ):
     try:
-        user_id = int(auth.get('user_id'))
+        query_params = environ.get('QUERY_STRING', '')
+        # making query string a dict
+        params = dict(q.split('=') for q in query_params.split('&') if q)
+        user_id = int(params.get('user_id'))
         if user_id:
             user_socket_map[user_id] = sid
             await sio.emit("getOnlineUsers", list(user_socket_map.keys()))
@@ -62,6 +69,7 @@ async def disconnect(sid):
         del user_socket_map[user_id]
         await sio.emit("getOnlineUsers", list(user_socket_map.keys()))
         print(f"User {user_id} disconnected")
+
 
 
 # endpoint for registration

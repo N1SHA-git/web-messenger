@@ -9,6 +9,10 @@ import { ChatHeader } from "./chat-header";
 import Image from "next/image";
 import { getMessages } from "@/store/slices/chatSlice";
 import { formatMessageTime } from "@/shared/lib/utils";
+import {
+  subscribeToMessages,
+  unsubscribeFromMessages,
+} from "@/store/slices/chatSlice";
 
 export function ChatContainer() {
   const { messages, isMessagesLoading, selectedUser } = useSelector(
@@ -21,10 +25,12 @@ export function ChatContainer() {
   useEffect(() => {
     dispatch(getMessages());
 
-    // subscribeToMessages();
+    dispatch(subscribeToMessages());
 
-    // return () => unsubscribeFromMessages();
-  }, [dispatch]);
+    return () => {
+      dispatch(unsubscribeFromMessages());
+    };
+  }, [dispatch, selectedUser?.id]);
 
   useEffect(() => {
     if (messageEndRef.current && messages) {
@@ -73,13 +79,16 @@ export function ChatContainer() {
                 {formatMessageTime(message.created_at)}
               </time>
             </div>
-            <div className="chat-bubble flex flex-col">
+            <div
+              className="chat-bubble flex flex-c
+            ol"
+            >
               {message.image && (
                 <Image
                   src={message.image}
                   alt="Attachment"
                   width={200}
-                  height={0}
+                  height={200}
                   className="sm:max-w-[200px] h-auto rounded-md mb-2"
                 />
               )}

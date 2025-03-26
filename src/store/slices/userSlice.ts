@@ -1,12 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import type { WritableDraft } from "immer";
 import type { UserEntity } from "@/entities/user/server";
 import { userRepository } from "@/entities/user/repositories/user";
 import { UserId } from "@/kernel/ids";
 import { RootState } from "../store";
-import { io, Socket } from "socket.io-client";
-
-const BASE_URL = "http://localhost:3000"; // url for socket in prod: '/'
+import { socket, connectSocket, disconnectSocket } from "@/shared/lib/socket";
 
 type UserState = {
   user: UserEntity | null;
@@ -14,7 +11,6 @@ type UserState = {
   isUpdatingProfile: boolean;
   onlineUsers: UserId[];
   error: string | null;
-  socket: Socket | null;
 };
 
 const initialState: UserState = {
@@ -23,43 +19,18 @@ const initialState: UserState = {
   isUpdatingProfile: false,
   onlineUsers: [],
   error: null,
-  socket: null,
 };
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    clearUser: () => initialState,
-    connectSocket: (state, action: PayloadAction<{ userId: UserId }>) => {
-      if (state.socket?.connected) return;
-
-      const socket = io(BASE_URL, {
-        query: {
-          userId: action.payload.userId,
-        },
-        transports: ["websocket"]
-      });
-
-      socket.on("connect", () => {
-        console.log("Socket connected");
-      });
-
-      socket.on("getOnlineUsers", (userIds: UserId[]) => {
-        state.onlineUsers = userIds;
-      });
-
-      socket.on("disconnect", () => {
-        console.log("Socket disconnected");
-      });
-
-      state.socket = socket as unknown as WritableDraft<Socket | null>;
+    logout: () => {
+      disconnectSocket();
+      return initialState;
     },
-    disconnectSocket: (state) => {
-      if (state.socket?.connected) {
-        state.socket.disconnect();
-      }
-      state.socket = null;
+    setOnlineUsers: (state, action: PayloadAction<UserId[]>) => {
+      state.onlineUsers = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -103,18 +74,22 @@ const userSlice = createSlice({
 
 export const fetchUser = createAsyncThunk<
   UserEntity,
-  void,
+  UserId,
   { state: RootState; rejectValue: string }
->("user/fetchUser", async (_, thunkAPI) => {
-  const { user } = thunkAPI.getState();
-  const userId = user.user?.id;
-  if (!userId) {
-    return thunkAPI.rejectWithValue("User ID is missing");
-  }
+>("user/fetchUser", async (userId, thunkAPI) => {
+  const dispatch = thunkAPI.dispatch;
   try {
     const { user: fetchedUser, errorMessage } =
       await userRepository.getUser(userId);
     if (fetchedUser) {
+      connectSocket(userId);
+      
+      if (!socket.hasListeners("getOnlineUsers")) {
+        socket.on("getOnlineUsers", (userIds) =>
+          dispatch(setOnlineUsers(userIds)),
+        );
+      }
+
       return fetchedUser;
     } else {
       return thunkAPI.rejectWithValue(errorMessage || "Unknown error");
@@ -150,5 +125,5 @@ export const updateProfile = createAsyncThunk<
   }
 });
 
-export const { clearUser } = userSlice.actions;
+export const { logout, setOnlineUsers } = userSlice.actions;
 export default userSlice.reducer;

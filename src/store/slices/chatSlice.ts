@@ -5,7 +5,8 @@ import { UserEntity } from "@/entities/user/server";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { MessageData } from "@/entities/message/domain";
 import { send_message } from "@/entities/message/services/send-message";
-import { RootState } from "../store";
+import { RootState,AppDispatch } from "../store";
+import { socket } from "@/shared/lib/socket";
 
 type ChatState = {
   messages: MessageEntity[];
@@ -31,6 +32,9 @@ const chatSlice = createSlice({
   reducers: {
     setSelectedUser: (state, action: PayloadAction<UserEntity | null>) => {
       state.selectedUser = action.payload;
+    },
+    addMessage: (state, action: PayloadAction<MessageEntity>) => {
+      state.messages.push(action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -132,5 +136,26 @@ export const sendMessage = createAsyncThunk<
   }
 });
 
-export const { setSelectedUser } = chatSlice.actions;
+export const subscribeToMessages = () => (dispatch: AppDispatch, getState: () => RootState) => {
+  const { selectedUser } = getState().chat;
+  if (!selectedUser) return;
+
+  
+  if (!socket.hasListeners("newMessage")) {
+    socket.on("newMessage", (newMessage: MessageEntity) => {
+
+      if (newMessage.sender_id === selectedUser.id) {
+        dispatch(addMessage(newMessage));
+      }
+    });
+  }
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const unsubscribeFromMessages = () => (dispatch: AppDispatch, getState: () => RootState) => {
+  socket.off("newMessage");
+};
+
+
+export const { setSelectedUser,addMessage } = chatSlice.actions;
 export default chatSlice.reducer;

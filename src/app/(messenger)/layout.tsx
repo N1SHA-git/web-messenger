@@ -13,16 +13,26 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     (state: RootState) => state.user.isInitialized,
   );
 
-  //useEffect for getting session and connect to socket
-
   useEffect(() => {
     const controller = new AbortController();
+    const signal = controller.signal;
 
-    const fetchSession = async () => {
-      await dispatch(fetchUser());
+    const fetchSession = async (signal: AbortSignal) => {
+      try {
+        const res = await fetch("/api/session", { signal });
+        if (!res.ok) throw new Error("Ошибка запроса");
+        const data = await res.json();
+        if (data.userId) {
+          await dispatch(fetchUser(data.userId));
+        }
+      } catch (error) {
+        if (error instanceof Error && error.name !== "AbortError") {
+          console.error("Ошибка при получении сессии:", error);
+        }
+      }
     };
 
-    fetchSession();
+    fetchSession(signal);
 
     return () => controller.abort(); // Отменяем запрос при размонтировании
   }, [dispatch]);
